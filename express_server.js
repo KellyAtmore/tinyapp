@@ -90,6 +90,11 @@ app.post("/login", (req, res) => {
 });
 
 
+//clear cookie on logout
+app.post("/logout", (req, res) => {
+  res.clearCookie("username", req.body.username);
+  res.redirect("/urls");
+});
 
 // app.get("/hello", (req, res) => {
 //   res.send("<html><body>Hello <b>World</b></body></html>\n"); });
