@@ -105,8 +105,38 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 //render the login page
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
+  const email = req.body.email;
+  const password = req.body.password;
+  
+  let foundUser = null;
+  for (const userId in users) {
+    const user = users[userId];
+    
+    if (user.email === email && user.password === password) {
+      foundUser = user;
+    }
+    
+  }
+  if (!foundUser) {
+    return res.status(403).send("no user with that email was found");
+  }
+  // users[randomID] = {
+  //   id: randomID,
+  //   email: req.body.email,
+  //   password: req.body.password
+  
+  // };
+  res.cookie("userId", foundUser.id);
   res.redirect("/urls");
+});
+
+app.get("/login", (req, res) => {
+  const userId = req.cookies['userId'];
+  const templateVars = { urls: urlDatabase, user: users[userId]};
+  
+
+  res.render("login", templateVars);
+
 });
 
 
@@ -121,11 +151,20 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   const randomID =  generateRandomString();
   
-  users[randomID] = {
-    id: randomID,
-    email: req.body.email,
-    password: req.body.password
-  };
+  /**
+  * get the body of the request
+  *
+  * Validate the request
+  * --- return if validation fails
+  * Check if the user already exist
+  * ---return user already exist
+  *
+  * At this point the user is unique
+  * and the request is valid
+  *
+  * Create the user
+  *
+  */
 
   //check if email/password are empty
   const email = req.body.email;
@@ -141,12 +180,19 @@ app.post("/register", (req, res) => {
     const user = users[userId];
   
     if (user.email === email) {
-      res.status(400).send("This email is already registered");
+      return res.status(400).send("This email is already registered");
     }
-    res.cookie("userId", randomID);
-    //console.log(users);
-    res.redirect("/urls");
   }
+  users[randomID] = {
+    id: randomID,
+    email: req.body.email,
+    password: req.body.password
+  };
+
+  res.cookie("userId", randomID);
+  //console.log(users);
+  res.redirect("/urls");
+  console.log(users);
 });
 
 app.get("/register", (req, res) => {

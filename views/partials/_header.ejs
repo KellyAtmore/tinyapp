@@ -14,15 +14,16 @@
      </div>
 <div class="container d-flex justify-content-end">
      <% if(user){ %>
-      <form class="form-inline" placeholder="username" method="POST" action="/logout" >
+      <form class="form-inline" placeholder="email" method="POST" action="/logout" >
         <p class="text-info margin: 1em"> Logged in as: <%= user.email %></p>
         <button type="submit" class="btn btn-outline-danger my-2 my-sm-0 ">Logout</button>
       </form>
     <% } else{ %>  
-      <form class="form-inline my-2 my-lg-0" placeholder="username" method="POST" action="/login" >
-        <input name="username" style="width: 200px; margin: 1em">
-        <button type="submit" class="btn btn-outline-success my-2 my-sm-0">Login</button>
-      </form>
+    
+     
+     <a class="nav-item nav-link" href="/login">LOGIN</a>
+     <a class="nav-item nav-link" href="/register">REGISTER</a>
+
    <% } %>
   </div>
    
