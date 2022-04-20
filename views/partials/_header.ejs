@@ -13,9 +13,9 @@
         
      </div>
 <div class="container d-flex justify-content-end">
-     <% if(username){ %>
+     <% if(user){ %>
       <form class="form-inline" placeholder="username" method="POST" action="/logout" >
-        <p class="text-info margin: 1em"> Logged in as: <%= username %></p>
+        <p class="text-info margin: 1em"> Logged in as: <%= user.email %></p>
         <button type="submit" class="btn btn-outline-danger my-2 my-sm-0 ">Logout</button>
       </form>
     <% } else{ %>  
