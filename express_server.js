@@ -75,6 +75,8 @@ const users = {
 
 //ROUTES ---->
 
+
+//shows urls of user logged in
 app.get("/urls", (req, res) => {
   const userId = req.cookies['userId'];
   const user = users[userId];
@@ -82,14 +84,10 @@ app.get("/urls", (req, res) => {
   if (!user) {
     return res.redirect("/login");
   }
-  
   let templateVars = {
     user: user,
     urls: urlsForUser(user.id)
   };
-  
-  // const templateVars = { urls: urlDatabase, user: users[userId]};
-  console.log(templateVars);
   res.render("urls_index", templateVars);
 });
 
@@ -101,9 +99,7 @@ app.get("/urls.json", (req, res) => {
 //creates short url with user input and redirects to page displaying long and short urls
 app.post("/urls", (req, res) => {
   const userId = req.cookies['userId'];
-  console.log(req.body);  // Log the POST request body to the console
   const shortURL =  generateRandomString();
-  
   urlDatabase[shortURL] = {longURL : req.body.longURL, userID: userId};
      
   res.redirect("/urls/" + shortURL);
@@ -113,9 +109,7 @@ app.post("/urls", (req, res) => {
 //render new urls page
 app.get("/urls/new", (req, res) => {
   const userId = req.cookies['userId'];
-  
   const user = users[userId];
-
   if (!user) {
     return res.redirect("/login");
   }
@@ -126,11 +120,8 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   const userId = req.cookies['userId'];
-  
   const shortURL = req.params.shortURL;
-  
   const templateVars = {shortURL, longURL: urlDatabase[shortURL]["longURL"], user: users[userId] };
-  
   
   res.render("urls_show", templateVars);
 });
@@ -146,21 +137,29 @@ app.get("/u/:shortURL", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   const updatedLongUrl = req.body.updated_longURL;
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL]["longURL"] = updatedLongUrl;
+  const userId = req.cookies['userId'];
+  const user = users[userId];
   
-  res.redirect("/urls");
+  
+  if (user.id === userId) {
+    urlDatabase[shortURL]["longURL"] = updatedLongUrl;
+    res.redirect("/urls");
+  } if (user.id !== userId) {
+    res.send("you don't have permissions for this url");
+  }
+
+
 });
 
 //remove a url
 app.post("/urls/:shortURL/delete", (req, res) => {
   const userId = req.cookies['userId'];
   const user = users[userId];
-  
- 
-
-  delete urlDatabase[req.params.shortURL];
-  res.redirect("/urls");
-  
+  //const urlOwner = urlDatabase["shortURL"].userID;
+  if (user.id === userId) {
+    delete urlDatabase[req.params.shortURL];
+    res.redirect("/urls");
+  }
 });
 
 
@@ -188,10 +187,7 @@ app.post("/login", (req, res) => {
 app.get("/login", (req, res) => {
   const userId = req.cookies['userId'];
   const templateVars = { urls: urlDatabase, user: users[userId]};
-  
-
   res.render("login", templateVars);
-
 });
 
 
@@ -206,21 +202,6 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   const randomID =  generateRandomString();
   
-  /**
-  * get the body of the request
-  *
-  * Validate the request
-  * --- return if validation fails
-  * Check if the user already exist
-  * ---return user already exist
-  *
-  * At this point the user is unique
-  * and the request is valid
-  *
-  * Create the user
-  *
-  */
-
   //check if email/password are empty
   const email = req.body.email;
   const password = req.body.password;
@@ -229,8 +210,6 @@ app.post("/register", (req, res) => {
     return res.status(400).send("Please enter an email and password");
   }
   
-  
-  //let foundUser = null;
   for (const userId in users) {
     const user = users[userId];
   
@@ -243,18 +222,14 @@ app.post("/register", (req, res) => {
     email: req.body.email,
     password: req.body.password
   };
-
   res.cookie("userId", randomID);
-  //console.log(users);
   res.redirect("/urls");
-  console.log(users);
 });
 
 app.get("/register", (req, res) => {
   const userId = req.cookies.userId;
   const templateVars = {user: userId};
   res.render("register", templateVars);
-
 });
 
 app.listen(PORT, () => {

@@ -15,8 +15,8 @@
 <div class="container d-flex justify-content-end">
      <% if(user){ %>
       <form class="form-inline" placeholder="email" method="POST" action="/logout" >
-        <p class="text-info margin: 1em"> Logged in as: <%= user.email %></p>
-        <button type="submit" class="btn btn-outline-danger my-2 my-sm-0 ">Logout</button>
+        <p class="margin: 1em" style = "color: lightgoldenrodyellow" > Logged in as: <%= user.email %></p>
+        <button type="submit" class="btn btn-danger my-2 my-sm-0 ">Logout</button>
       </form>
     <% } else{ %>  
     
