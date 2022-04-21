@@ -23,8 +23,14 @@ const generateRandomString = function() {
 //DATABASES ------>
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW"
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW"
+  }
 };
 
 
@@ -48,6 +54,7 @@ app.get("/urls", (req, res) => {
   const userId = req.cookies['userId'];
   
   const templateVars = { urls: urlDatabase, user: users[userId]};
+  console.log(templateVars);
   res.render("urls_index", templateVars);
 });
 
@@ -58,9 +65,11 @@ app.get("/urls.json", (req, res) => {
 
 //creates short url with user input and redirects to page displaying long and short urls
 app.post("/urls", (req, res) => {
+  const userId = req.cookies['userId'];
   console.log(req.body);  // Log the POST request body to the console
   const shortURL =  generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[userId] = {id: userId, shortURL : req.body.shortURL, longURL : req.body.longURL};
+     
   res.redirect("/urls/" + shortURL);
 });
 
@@ -69,8 +78,16 @@ app.post("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const userId = req.cookies['userId'];
   
+  const user = users[userId];
+
+  if (!user) {
+    return res.redirect("/login");
+  }
+  
+ 
   const templateVars = { urls: urlDatabase, user: users[userId]};
   res.render("urls_new", templateVars);
+
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -118,14 +135,8 @@ app.post("/login", (req, res) => {
     
   }
   if (!foundUser) {
-    return res.status(403).send("no user with that email was found");
+    return res.status(403).send("username or password incorrect");
   }
-  // users[randomID] = {
-  //   id: randomID,
-  //   email: req.body.email,
-  //   password: req.body.password
-  
-  // };
   res.cookie("userId", foundUser.id);
   res.redirect("/urls");
 });
