@@ -9,6 +9,9 @@ app.use(cookieParser());
 app.set("view engine", "ejs");
 
 
+// FUNCTIONS ---->
+
+
 //function for generating short url and userid
 const generateRandomString = function() {
   const chars = "abcdefghijklmnopqrstuvwxyz";
@@ -17,6 +20,28 @@ const generateRandomString = function() {
     result += chars.charAt(Math.floor(Math.random() * 6));
   }
   return result;
+};
+
+
+//function for filtering users urls
+//const urlsForUser = (req) => {
+// takes in the req object so we can check the cookies
+// loop through the urls in the urldatabase
+//   check to see if the user ID attached to the url matches the user id in the req.cookie
+//     add that to the output as { shortURL : longURL }
+// return output
+
+
+const urlsForUser = function(id) {
+  
+  const urls = {};
+    
+  for (let shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === id) {
+      urls[shortURL] = urlDatabase[shortURL];
+    }
+  }
+  return urls;
 };
 
 
@@ -52,8 +77,18 @@ const users = {
 
 app.get("/urls", (req, res) => {
   const userId = req.cookies['userId'];
+  const user = users[userId];
+
+  if (!user) {
+    return res.redirect("/login");
+  }
   
-  const templateVars = { urls: urlDatabase, user: users[userId]};
+  let templateVars = {
+    user: user,
+    urls: urlsForUser(user.id)
+  };
+  
+  // const templateVars = { urls: urlDatabase, user: users[userId]};
   console.log(templateVars);
   res.render("urls_index", templateVars);
 });
@@ -118,8 +153,14 @@ app.post("/urls/:shortURL", (req, res) => {
 
 //remove a url
 app.post("/urls/:shortURL/delete", (req, res) => {
+  const userId = req.cookies['userId'];
+  const user = users[userId];
+  
+ 
+
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
+  
 });
 
 
