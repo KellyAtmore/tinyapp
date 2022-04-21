@@ -68,7 +68,8 @@ app.post("/urls", (req, res) => {
   const userId = req.cookies['userId'];
   console.log(req.body);  // Log the POST request body to the console
   const shortURL =  generateRandomString();
-  urlDatabase[userId] = {id: userId, shortURL : req.body.shortURL, longURL : req.body.longURL};
+  
+  urlDatabase[shortURL] = {longURL : req.body.longURL, userID: userId};
      
   res.redirect("/urls/" + shortURL);
 });
@@ -83,8 +84,6 @@ app.get("/urls/new", (req, res) => {
   if (!user) {
     return res.redirect("/login");
   }
-  
- 
   const templateVars = { urls: urlDatabase, user: users[userId]};
   res.render("urls_new", templateVars);
 
@@ -94,13 +93,17 @@ app.get("/urls/:shortURL", (req, res) => {
   const userId = req.cookies['userId'];
   
   const shortURL = req.params.shortURL;
-  const templateVars = {shortURL, longURL: urlDatabase[shortURL], user: users[userId] };
+  
+  const templateVars = {shortURL, longURL: urlDatabase[shortURL]["longURL"], user: users[userId] };
+  
+  
   res.render("urls_show", templateVars);
 });
 
 //redirects user to the long url address using the short url link
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL]["longURL"];
   res.redirect(longURL);
 });
 
@@ -108,7 +111,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   const updatedLongUrl = req.body.updated_longURL;
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = updatedLongUrl;
+  urlDatabase[shortURL]["longURL"] = updatedLongUrl;
   
   res.redirect("/urls");
 });
