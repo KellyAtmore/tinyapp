@@ -1,6 +1,6 @@
-
-
+//Function for generating random id and shorturl
 const generateRandomString = function() {
+  
   const chars = "abcdefghijklmnopqrstuvwxyz";
   let result = "";
   for (let i = 0; i < 6; i++) {
@@ -9,10 +9,10 @@ const generateRandomString = function() {
   return result;
 };
 
+//returns urls based on user id
 const urlsForUser = function(urlDatabase,id) {
+  
   const urls = {};
-  console.log("this is id", id);
-  console.log("database", urlDatabase);
   for (let shortURL in urlDatabase) {
     if (urlDatabase[shortURL].userID === id) {
       urls[shortURL] = urlDatabase[shortURL];
@@ -21,11 +21,10 @@ const urlsForUser = function(urlDatabase,id) {
   return urls;
 };
 
-
+//used for checking if emails already exist & password macthing
 const getUserByEmail = function(email, users) {
-  for (const userId in users) {
-    //const user = users[userId];
   
+  for (const userId in users) {
     if (users[userId].email === email) {
       return users[userId];
     }
