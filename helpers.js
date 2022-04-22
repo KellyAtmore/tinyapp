@@ -1,13 +1,4 @@
-const urlDatabase = {
-  b6UTxQ: {
-    longURL: "https://www.tsn.ca",
-    userID: "aJ48lW"
-  },
-  i3BoGr: {
-    longURL: "https://www.google.ca",
-    userID: "aJ48lW"
-  }
-};
+
 
 const generateRandomString = function() {
   const chars = "abcdefghijklmnopqrstuvwxyz";
@@ -18,8 +9,10 @@ const generateRandomString = function() {
   return result;
 };
 
-const urlsForUser = function(id) {
+const urlsForUser = function(urlDatabase,id) {
   const urls = {};
+  console.log("this is id", id);
+  console.log("database", urlDatabase);
   for (let shortURL in urlDatabase) {
     if (urlDatabase[shortURL].userID === id) {
       urls[shortURL] = urlDatabase[shortURL];
@@ -31,10 +24,10 @@ const urlsForUser = function(id) {
 
 const getUserByEmail = function(email, users) {
   for (const userId in users) {
-    const user = users[userId];
+    //const user = users[userId];
   
     if (users[userId].email === email) {
-      return user;
+      return users[userId];
     }
   }
   return null;

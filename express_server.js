@@ -22,10 +22,9 @@ const urlDatabase = {
   },
   i3BoGr: {
     longURL: "https://www.google.ca",
-    userID: "aJ48lW"
+    userID: "user2RandomID"
   }
 };
-
 
 const users = {
   "userRandomID": {
@@ -36,7 +35,7 @@ const users = {
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: "a"
   }
 };
 
@@ -52,8 +51,9 @@ app.get("/urls", (req, res) => {
   }
   let templateVars = {
     user: user,
-    urls: urlsForUser(user.id)
+    urls: urlsForUser(urlDatabase,user.id)
   };
+  console.log("this is template vars", templateVars);
   res.render("urls_index", templateVars);
 });
 
@@ -119,13 +119,13 @@ app.post("/urls/:shortURL", (req, res) => {
 
 //remove a url
 app.post("/urls/:shortURL/delete", (req, res) => {
-  const userId = req.cookies['userId'];
-  const user = users[userId];
-  
-  if (user.id === userId) {
+  const userId = req.session.user_id;
+
+  if (userId && userId in users) {
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
   }
+  
 });
 
 //render the login page
@@ -197,4 +197,3 @@ app.get("/register", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
